@@ -73,7 +73,16 @@ func (k Keeper) OnRecvCandidatePacket(ctx sdk.Context, packet channeltypes.Packe
 		return packetAck, err
 	}
 
-	// TODO: packet reception logic
+	// validate packet data upon receiving
+	if err := data.ValidateBasic(); err != nil {
+		return packetAck, err
+	}
+
+	// Fully override the entry at key [data.PlayerInfo.Index]
+	k.SetPlayerInfo(ctx, *data.PlayerInfo)
+
+	// Update board with the new map values
+	k.UpdateBoard(ctx, k.GetAllPlayerInfo(ctx))
 
 	return packetAck, nil
 }
